@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{7C8F3B5E-12F3-43F5-9080-B58471ABB7A1}</ProjectGuid>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>FantasyPlayer.Dalamud</AssemblyTitle>
     <Product>FantasyPlayer.Dalamud</Product>
     <Copyright>Copyright ©  2020</Copyright>
     <Deterministic>false</Deterministic>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -21,27 +25,41 @@
         </AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="1.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="SpotifyAPI.Web" Version="6.0.0" />
+    <Reference Include="SpotifyAPI.Web">
+      <HintPath>Dlls\SpotifyAPI.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SpotifyAPI.Web.Auth">
+      <HintPath>Dlls\SpotifyAPI.Web.Auth.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DalamudPackager" Version="2.1.10" />
+    <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Dalamud">
       <HintPath>$(DALAMUD_ROOT)\Dalamud.dll</HintPath>
       <HintPath>..\libs\Dalamud.dll</HintPath>
-      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\Dalamud.dll</HintPath>
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ImGui.NET">
       <HintPath>$(DALAMUD_ROOT)\ImGui.NET.dll</HintPath>
       <HintPath>..\libs\ImGui.NET.dll</HintPath>
-      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\ImGui.NET.dll</HintPath>
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ImGuiScene">
       <HintPath>$(DALAMUD_ROOT)\ImGuiScene.dll</HintPath>
       <HintPath>..\libs\ImGuiScene.dll</HintPath>
-      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\ImGuiScene.dll</HintPath>
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(DALAMUD_ROOT)\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

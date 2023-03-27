@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface;
 using FantasyPlayer.Dalamud.Config;
 using FantasyPlayer.Dalamud.Manager;
@@ -80,7 +81,7 @@ namespace FantasyPlayer.Dalamud.Interface.Window
 
         private void CheckClientState()
         {
-            var isBoundByDuty = _plugin.PluginInterface.ClientState.Condition[ConditionFlag.BoundByDuty];
+            var isBoundByDuty = Service.Condition[ConditionFlag.BoundByDuty];
             if (_plugin.Configuration.AutoPlaySettings.PlayInDuty && isBoundByDuty &&
                 !_playerManager.CurrentPlayerProvider.PlayerState.IsPlaying)
             {
@@ -97,7 +98,7 @@ namespace FantasyPlayer.Dalamud.Interface.Window
         public void WindowLoop()
         {
             if (_plugin.Configuration.PlayerSettings.OnlyOpenWhenLoggedIn &&
-                _plugin.PluginInterface.ClientState.LocalContentId == 0)
+                Service.ClientState.LocalContentId == 0)
                 return; //Do nothing
 
             if (_playerManager.CurrentPlayerProvider == null &&

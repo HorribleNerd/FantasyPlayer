@@ -43,7 +43,7 @@ namespace FantasyPlayer.Dalamud.Manager
         {
             var args = argsString.ToLower().Split(' ');
 
-            var chat = _pluginInterface.Framework.Gui.Chat;
+            var chat = Service.ChatGui;
 
             if (args.Length == 0)
                 PrintHelp(false, 0, CallbackResponse.None);
@@ -100,7 +100,7 @@ namespace FantasyPlayer.Dalamud.Manager
 
         private void PrintHelp(bool boolValue, int intValue, CallbackResponse response)
         {
-            var chat = _pluginInterface.Framework.Gui.Chat;
+            var chat = Service.ChatGui;
 
             var helpMessage = "";
             helpMessage += "Fantasy Player Command Help:\n";

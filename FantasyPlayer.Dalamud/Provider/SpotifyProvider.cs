@@ -14,8 +14,8 @@ namespace FantasyPlayer.Dalamud.Provider
         private SpotifyState _spotifyState;
         private string _lastId;
         
-        private Thread _startThread;
-        private Thread _loginThread;
+        private CancellationTokenSource _startCts;
+        private CancellationTokenSource _loginCts;
 
         public void Initialize(Plugin plugin)
         {
@@ -35,8 +35,8 @@ namespace FantasyPlayer.Dalamud.Provider
             if (_plugin.Configuration.SpotifySettings.TokenResponse == null) return;
             _spotifyState.TokenResponse = _plugin.Configuration.SpotifySettings.TokenResponse;
             _spotifyState.RequestToken();
-            _startThread = new Thread(_spotifyState.Start);
-            _startThread.Start();
+            _startCts = new CancellationTokenSource();
+            ThreadPool.QueueUserWorkItem(_spotifyState.Start, _startCts.Token);
         }
 
         private void OnPlayerStateUpdate(CurrentlyPlayingContext currentlyPlaying, FullTrack playbackItem)
@@ -82,7 +82,7 @@ namespace FantasyPlayer.Dalamud.Provider
             {
                 if (!_plugin.Configuration.SpotifySettings.LimitedAccess
                 ) //Do a check to not spam the user, I don't want to force it down their throats. (fuck marketing)
-                    _plugin.PluginInterface.Framework.Gui.Chat.PrintError(
+                    Service.ChatGui.PrintError(
                         "Uh-oh, it looks like you're not premium on Spotify. Some features in Fantasy Player have been disabled.");
 
                 _plugin.Configuration.SpotifySettings.LimitedAccess = true;
@@ -108,16 +108,26 @@ namespace FantasyPlayer.Dalamud.Provider
 
         public void Dispose()
         {
-            _startThread?.Abort();
-            _loginThread?.Abort();
+            if (_startCts != null)
+            {
+                _startCts.Cancel();
+                _startCts.Dispose();
+            }
+
+            if (_loginCts != null)
+            {
+                _loginCts.Cancel();
+                _loginCts.Dispose();
+            }
+
             _spotifyState.OnLoggedIn -= OnLoggedIn;
             _spotifyState.OnPlayerStateUpdate -= OnPlayerStateUpdate;
         }
 
         public void StartAuth()
         {
-            _loginThread = new Thread(_spotifyState.StartAuth);
-            _loginThread.Start();
+            _loginCts = new CancellationTokenSource();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(_spotifyState.StartAuth), _loginCts.Token);
 
             var playerStateStruct = PlayerState;
             playerStateStruct.IsAuthenticating = true;

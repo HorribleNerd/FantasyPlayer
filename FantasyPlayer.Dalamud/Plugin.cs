@@ -23,9 +23,10 @@ namespace FantasyPlayer.Dalamud
 
         public string Version { get; private set; }
 
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public Plugin(DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
+            PluginInterface.Create<Service>();
 
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(pluginInterface);
@@ -36,7 +37,7 @@ namespace FantasyPlayer.Dalamud
             Version =
                 $"FP{VersionInfo.VersionNum}{VersionInfo.Type}_SP{Spotify.VersionInfo.VersionNum}{Spotify.VersionInfo.Type}_HX{config.ApiVersion}";
 
-            PluginInterface.CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
+            Service.CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Run commands for Fantasy Player"
             });
@@ -48,8 +49,8 @@ namespace FantasyPlayer.Dalamud
 
             InterfaceController = new InterfaceController(this);
 
-            PluginInterface.UiBuilder.OnBuildUi += InterfaceController.Draw;
-            PluginInterface.UiBuilder.OnOpenConfigUi += OpenConfig;
+            PluginInterface.UiBuilder.Draw += InterfaceController.Draw;
+            PluginInterface.UiBuilder.OpenConfigUi += OpenConfig;
         }
 
         private void OnCommand(string command, string arguments)
@@ -62,19 +63,19 @@ namespace FantasyPlayer.Dalamud
             if (!Configuration.DisplayChatMessages)
                 return;
 
-            PluginInterface.Framework.Gui.Chat.Print(message);
+            Service.ChatGui.Print(message);
         }
 
-        public void OpenConfig(object sender, EventArgs e)
+        public void OpenConfig()
         {
             Configuration.ConfigShown = true;
         }
 
         public void Dispose()
         {
-            PluginInterface.CommandManager.RemoveHandler(Command);
-            PluginInterface.UiBuilder.OnBuildUi -= InterfaceController.Draw;
-            PluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfig;
+            Service.CommandManager.RemoveHandler(Command);
+            PluginInterface.UiBuilder.Draw -= InterfaceController.Draw;
+            PluginInterface.UiBuilder.OpenConfigUi -= OpenConfig;
 
             InterfaceController.Dispose();
             PlayerManager.Dispose();

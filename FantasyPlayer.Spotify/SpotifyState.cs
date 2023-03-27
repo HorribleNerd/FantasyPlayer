@@ -35,8 +35,6 @@ namespace FantasyPlayer.Spotify
 
         public OnLoggedInDelegate OnLoggedIn;
 
-        private static Thread _stateThread;
-
         private readonly ICollection<String> _scopes = new List<string>
         {
             Scopes.UserReadPrivate,
@@ -48,6 +46,7 @@ namespace FantasyPlayer.Spotify
         private string _challenge;
         private string _verifier;
         private LoginRequest _loginRequest;
+        private CancellationTokenSource _stateUpdateCts;
 
         public SpotifyState(string loginUri, string clientId, int port, int playerRefreshTime)
         {
@@ -91,10 +90,16 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        public async void Start()
+        public async void Start(object obj)
         {
             try
             {
+                CancellationToken token = (CancellationToken)obj;
+                if (token.IsCancellationRequested)
+                {
+                    _stateUpdateCts?.Cancel();
+                    return;
+                }
                 _authenticator = new PKCEAuthenticator(_clientId!, TokenResponse);
 
                 var config = SpotifyClientConfig.CreateDefault()
@@ -113,8 +118,8 @@ namespace FantasyPlayer.Spotify
                     IsPremiumUser = true;
 
                 OnLoggedIn?.Invoke(_user, TokenResponse);
-                _stateThread = new Thread(StateUpdateTimer);
-                _stateThread.Start();
+                _stateUpdateCts = new CancellationTokenSource();
+                ThreadPool.QueueUserWorkItem(StateUpdateTimer, _stateUpdateCts.Token);
             }
             catch (Exception e)
             {
@@ -122,10 +127,15 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        private async void StateUpdateTimer()
+        private async void StateUpdateTimer(object obj)
         {
             while (true)
             {
+                CancellationToken token = (CancellationToken)obj;
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
                 var delayTask = Task.Delay(_playerRefreshTime); //Run timer every _playerRefreshTime
                 await CheckPlayerState();
                 await delayTask;
@@ -179,11 +189,20 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        public async void StartAuth()
+        public async void StartAuth(object obj)
         {
+            CancellationToken token = (CancellationToken)obj;
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
             GenerateCode();
 
             await _server.Start();
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
             _server.AuthorizationCodeReceived += async (sender, response) =>
             {
                 await _server.Stop();
@@ -191,8 +210,10 @@ namespace FantasyPlayer.Spotify
                     new PKCETokenRequest(_clientId!, response.Code, _server.BaseUri, _verifier)
                 );
 
-                Start();
+                Start(obj);
             };
+            
+
 
             CreateLoginRequest();
             var uri = _loginRequest.ToUri();
@@ -288,7 +309,8 @@ namespace FantasyPlayer.Spotify
 
         public void Dispose()
         {
-            _stateThread?.Abort();
+            _stateUpdateCts.Cancel();
+            _stateUpdateCts.Dispose();
             _server?.Stop();
         }
     }
