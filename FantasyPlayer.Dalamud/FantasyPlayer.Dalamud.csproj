@@ -60,6 +60,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ContentWithTargetPath Include="../.repo_resources/logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Images\icon.png</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="../.repo_resources/player_preview.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Images\screenshot1.png</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj" />
   </ItemGroup>
 </Project>
