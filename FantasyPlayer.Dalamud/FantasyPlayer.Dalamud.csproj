@@ -72,4 +72,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="images" />
+  </ItemGroup>
 </Project>
