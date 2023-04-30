@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantasyPlayer.Spotify", "FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj", "{64E9DE35-E1B3-467B-8AD5-E36BAB2A3F27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantasyPlayer.Dalamud", "FantasyPlayer.Dalamud\FantasyPlayer.Dalamud.csproj", "{7C8F3B5E-12F3-43F5-9080-B58471ABB7A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantasyPlayer", "FantasyPlayer\FantasyPlayer.csproj", "{7C8F3B5E-12F3-43F5-9080-B58471ABB7A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
