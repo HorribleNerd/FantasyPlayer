@@ -6,7 +6,6 @@ description: |-
   Originally by BiscuitUmU
 repo_url: https://github.com/Critical-Impact/FantasyPlayer
 punchline: Like you'd ever be sick of the in game music right?
-"IconUrl": "https://raw.githubusercontent.com/Critical-Impact/FantasyPlayer/main/.repo_resources/logo.png",
-"ImageUrls": [
-  "https://raw.githubusercontent.com/Critical-Impact/FantasyPlayer/main/.repo_resources/player_preview.png",
-]
+IconUrl: https://raw.githubusercontent.com/Critical-Impact/FantasyPlayer/main/.repo_resources/logo.png
+ImageUrls:
+  - https://raw.githubusercontent.com/Critical-Impact/FantasyPlayer/main/.repo_resources/player_preview.png
