@@ -23,8 +23,6 @@ namespace FantasyPlayer
         public PlayerManager PlayerManager { get; set; }
         public CommandManager CommandManager { get; set; }
 
-        public string Version { get; private set; }
-
         public Plugin(DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
@@ -32,9 +30,6 @@ namespace FantasyPlayer
 
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(pluginInterface);
-            
-            Version =
-                $"FP{VersionInfo.VersionNum}{VersionInfo.Type}_SP{Spotify.VersionInfo.VersionNum}{Spotify.VersionInfo.Type}";
 
             Service.CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
             {

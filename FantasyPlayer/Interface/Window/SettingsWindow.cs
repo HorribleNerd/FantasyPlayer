@@ -156,10 +156,6 @@ namespace FantasyPlayer.Interface.Window
 
                 ImGui.Separator();
 
-                ImGui.PushStyleColor(ImGuiCol.Text, InterfaceUtils.DarkenColor);
-                ImGui.Text(_plugin.Version);
-                ImGui.PopStyleColor();
-
                 ImGui.End();
             }
         }
