@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Dalamud.Game.Text;
 
 namespace FantasyPlayer.Config
 {
@@ -22,6 +23,7 @@ namespace FantasyPlayer.Config
         public bool DebugWindowOpen;
         
         public bool OnlyOpenWhenLoggedIn = true;
+        public XivChatType ChatType = XivChatType.Echo;
 
         public PlayerSettings()
         {

@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj" />
+    <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="images" />

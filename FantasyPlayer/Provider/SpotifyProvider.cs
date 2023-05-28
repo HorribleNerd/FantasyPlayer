@@ -26,8 +26,8 @@ namespace FantasyPlayer.Provider
                 RequiresLogin = true
             };
 
-            _spotifyState = new SpotifyState(_plugin.RemoteConfigManager.Config.SpotifyLoginUri, _plugin.RemoteConfigManager.Config.SpotifyClientId,
-                _plugin.RemoteConfigManager.Config.SpotifyLoginPort, _plugin.RemoteConfigManager.Config.SpotifyPlayerRefreshTime);
+            _spotifyState = new SpotifyState(Constants.SpotifyLoginUri, Constants.SpotifyClientId,
+                Constants.SpotifyLoginPort, Constants.SpotifyPlayerRefreshTime);
 
             _spotifyState.OnLoggedIn += OnLoggedIn;
             _spotifyState.OnPlayerStateUpdate += OnPlayerStateUpdate;

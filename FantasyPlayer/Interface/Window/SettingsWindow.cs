@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using System.Numerics;
 using FantasyPlayer.Manager;
+using OtterGui.Widgets;
 
 namespace FantasyPlayer.Interface.Window
 {
@@ -38,6 +39,13 @@ namespace FantasyPlayer.Interface.Window
                 {
                     if (ImGui.Checkbox("Display chat messages", ref _plugin.Configuration.DisplayChatMessages))
                         _plugin.Configuration.Save();
+                    if (Widget.DrawChatTypeSelector("Chat message output channel",
+                            "To which chat channel should the fantasy player messages be echo'd?",
+                            _plugin.Configuration.PlayerSettings.ChatType,
+                            type => { _plugin.Configuration.PlayerSettings.ChatType = type; }))
+                    {
+                        _plugin.Configuration.Save();
+                    }
                 }
 
                 if (!_plugin.Configuration.SpotifySettings.LimitedAccess)

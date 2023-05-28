@@ -1,8 +1,8 @@
 ﻿using System;
 using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
@@ -22,7 +22,6 @@ namespace FantasyPlayer
 
         public PlayerManager PlayerManager { get; set; }
         public CommandManager CommandManager { get; set; }
-        public RemoteManager RemoteConfigManager { get; set; }
 
         public string Version { get; private set; }
 
@@ -34,11 +33,8 @@ namespace FantasyPlayer
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(pluginInterface);
             
-            RemoteConfigManager = new RemoteManager(this);
-            var config = RemoteConfigManager.Config;
-
             Version =
-                $"FP{VersionInfo.VersionNum}{VersionInfo.Type}_SP{Spotify.VersionInfo.VersionNum}{Spotify.VersionInfo.Type}_HX{config.ApiVersion}";
+                $"FP{VersionInfo.VersionNum}{VersionInfo.Type}_SP{Spotify.VersionInfo.VersionNum}{Spotify.VersionInfo.Type}";
 
             Service.CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
             {
@@ -66,7 +62,13 @@ namespace FantasyPlayer
             if (!Configuration.DisplayChatMessages)
                 return;
 
-            Service.ChatGui.Print(message);
+            var entry = new XivChatEntry()
+            {
+                Message = message,
+                Name = SeString.Empty,
+                Type = Configuration.PlayerSettings.ChatType,
+            };
+            Service.ChatGui.PrintChat(entry);
         }
 
         public void DisplaySongTitle(string songTitle)
@@ -97,7 +99,13 @@ namespace FantasyPlayer
                     }),
             };
 
-            Service.ChatGui.Print(message);
+            var entry = new XivChatEntry()
+            {
+                Message = message,
+                Name = SeString.Empty,
+                Type = Configuration.PlayerSettings.ChatType,
+            };
+            Service.ChatGui.PrintChat(entry);
         }
 
         public void OpenConfig()

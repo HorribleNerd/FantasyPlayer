@@ -17,7 +17,7 @@ namespace FantasyPlayer.Config
         [NonSerialized] public bool ConfigShown;
 
         [NonSerialized] private DalamudPluginInterface _pluginInterface;
-
+        
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
