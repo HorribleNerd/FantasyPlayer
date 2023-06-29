@@ -25,7 +25,7 @@ public class MockPlugin : IDisposable, IPlugin
     public Configuration Configuration { get; set; }
 
     public PlayerManager PlayerManager { get; set; }
-    public ICommandManager CommandManager { get; set; }
+    public ICommandManagerFP CommandManager { get; set; }
     
     public IClientState ClientState { get; set; }
     public IConditionService ConditionService { get; }
@@ -56,7 +56,7 @@ public class MockPlugin : IDisposable, IPlugin
         _mockWindow = new MockWindow(this);
         PlayerManager = new PlayerManager(this);
 
-        CommandManager = new MockCommandManager();
+        CommandManager = new MockCommandManagerFp();
 
         InterfaceController = new InterfaceController(this);
     }

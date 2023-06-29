@@ -4,7 +4,7 @@ using FantasyPlayer.Manager;
 
 namespace FantasyPlayer.Interfaces;
 
-public interface ICommandManager
+public interface ICommandManagerFP
 {
     void ParseCommand(string argsString);
     void PrintHelp(bool boolValue, int intValue, CallbackResponse response);

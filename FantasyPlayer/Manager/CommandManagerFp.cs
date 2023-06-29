@@ -21,7 +21,7 @@ namespace FantasyPlayer.Manager
         ToggleValue
     }
 
-    public class CommandManager : ICommandManager
+    public class CommandManagerFp : ICommandManagerFP
     {
         private DalamudPluginInterface _pluginInterface;
         private IPlugin _plugin;
@@ -32,7 +32,7 @@ namespace FantasyPlayer.Manager
                 Action<bool, int, CallbackResponse>
                 commandCallback)>();
 
-        public CommandManager(DalamudPluginInterface pluginInterface, IPlugin plugin)
+        public CommandManagerFp(DalamudPluginInterface pluginInterface, IPlugin plugin)
         {
             _pluginInterface = pluginInterface;
             _plugin = plugin;

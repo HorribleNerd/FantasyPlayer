@@ -11,7 +11,6 @@ using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
 using FantasyPlayer.Services;
-using CommandManager = FantasyPlayer.Manager.CommandManager;
 
 namespace FantasyPlayer
 {
@@ -24,7 +23,7 @@ namespace FantasyPlayer
         public DalamudPluginInterface PluginInterface { get; private set; }
         public Configuration Configuration { get; set; }
         public PlayerManager PlayerManager { get; set; }
-        public ICommandManager CommandManager { get; set; }
+        public ICommandManagerFP CommandManager { get; set; }
         public IClientState ClientState { get; set; }
         public IConditionService ConditionService { get; set; }
         public IConfigurationManager ConfigurationManager { get; set; }
@@ -48,7 +47,7 @@ namespace FantasyPlayer
             //Setup player
             PlayerManager = new PlayerManager(this);
 
-            CommandManager = new CommandManager(pluginInterface, this);
+            CommandManager = new CommandManagerFp(pluginInterface, this);
 
             InterfaceController = new InterfaceController(this);
 

@@ -11,7 +11,7 @@ public interface IPlugin
     InterfaceController InterfaceController { get; set; }
     Configuration Configuration { get; }
     PlayerManager PlayerManager { get; }
-    ICommandManager CommandManager { get; }
+    ICommandManagerFP CommandManager { get; }
     IClientState ClientState { get; }
     IConditionService ConditionService { get; }
     IConfigurationManager ConfigurationManager { get; }

@@ -3,7 +3,7 @@ using FantasyPlayer.Manager;
 
 namespace FantasyPlayer.Mock;
 
-public class MockCommandManager : ICommandManager 
+public class MockCommandManagerFp : ICommandManagerFP 
 {
     public void ParseCommand(string argsString)
     {
