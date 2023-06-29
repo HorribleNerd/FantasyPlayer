@@ -21,6 +21,7 @@ namespace FantasyPlayer.Config
         public bool DisableInput;
         public bool PlayerLocked;
         public bool DebugWindowOpen;
+        public bool ShowTimeElapsed;
         
         public bool OnlyOpenWhenLoggedIn = true;
         public XivChatType ChatType = XivChatType.Echo;

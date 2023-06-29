@@ -1,35 +1,44 @@
 ﻿using System;
+using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
+using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
+using FantasyPlayer.Services;
 using CommandManager = FantasyPlayer.Manager.CommandManager;
 
 namespace FantasyPlayer
 {
-    public class Plugin : IDalamudPlugin
+    public class Plugin : IDalamudPlugin, IPlugin
     {
         public string Name => "FantasyPlayer";
         public const string Command = "/pfp";
 
-        private InterfaceController InterfaceController { get; set; }
+        public InterfaceController InterfaceController { get; set; }
         public DalamudPluginInterface PluginInterface { get; private set; }
         public Configuration Configuration { get; set; }
-
         public PlayerManager PlayerManager { get; set; }
-        public CommandManager CommandManager { get; set; }
+        public ICommandManager CommandManager { get; set; }
+        public IClientState ClientState { get; set; }
+        public IConditionService ConditionService { get; set; }
+        public IConfigurationManager ConfigurationManager { get; set; }
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
             PluginInterface.Create<Service>();
+            ClientState = Service.ClientState;
+            ConditionService = new ConditionService(Service.Condition);
 
-            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Initialize(pluginInterface);
+            ConfigurationManager = new ConfigurationManager(PluginInterface);
+            ConfigurationManager.Load();
+            Configuration = ConfigurationManager.Config;
 
             Service.CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
             {

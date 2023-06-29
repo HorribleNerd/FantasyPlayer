@@ -1,23 +1,28 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface;
 using FantasyPlayer.Config;
+using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
 using FantasyPlayer.Provider;
 using FantasyPlayer.Provider.Common;
 using ImGuiNET;
+using OtterGui;
 
 namespace FantasyPlayer.Interface.Window
 {
     public class PlayerWindow
     {
-        private readonly Plugin _plugin;
+        private readonly IPlugin _plugin;
         private readonly PlayerManager _playerManager;
 
-        private float _progressDelta;
+        private DateTime? _lastUpdated;
+        private DateTime? _lastPaused;
+        private TimeSpan _difference;
         private int _progressMs;
         private string _lastId;
         private bool _lastBoundByDuty;
@@ -32,7 +37,7 @@ namespace FantasyPlayer.Interface.Window
             39 * ImGui.GetIO().FontGlobalScale);
 
 
-        public PlayerWindow(Plugin plugin)
+        public PlayerWindow(IPlugin plugin)
         {
             _plugin = plugin;
             _playerManager = _plugin.PlayerManager;
@@ -81,7 +86,7 @@ namespace FantasyPlayer.Interface.Window
 
         private void CheckClientState()
         {
-            var isBoundByDuty = Service.Condition[ConditionFlag.BoundByDuty];
+            var isBoundByDuty = _plugin.ConditionService[ConditionFlag.BoundByDuty];
             if (_plugin.Configuration.AutoPlaySettings.PlayInDuty && isBoundByDuty &&
                 !_playerManager.CurrentPlayerProvider.PlayerState.IsPlaying)
             {
@@ -98,7 +103,7 @@ namespace FantasyPlayer.Interface.Window
         public void WindowLoop()
         {
             if (_plugin.Configuration.PlayerSettings.OnlyOpenWhenLoggedIn &&
-                Service.ClientState.LocalContentId == 0)
+                _plugin.ClientState.LocalContentId == 0)
                 return; //Do nothing
 
             if (_playerManager.CurrentPlayerProvider == null &&
@@ -131,28 +136,28 @@ namespace FantasyPlayer.Interface.Window
             {
                 ImGui.SetNextWindowSize(_playerWindowSize);
                 _plugin.Configuration.PlayerSettings.FirstRunNone = false;
-                _plugin.Configuration.Save();
+                _plugin.ConfigurationManager.Save();
             }
 
             if (playerSettings.CompactPlayer && playerSettings.FirstRunCompactPlayer)
             {
                 ImGui.SetNextWindowSize(_windowSizeCompact);
                 _plugin.Configuration.PlayerSettings.FirstRunCompactPlayer = false;
-                _plugin.Configuration.Save();
+                _plugin.ConfigurationManager.Save();
             }
 
             if (playerSettings.NoButtons && playerSettings.FirstRunSetNoButtons)
             {
                 ImGui.SetNextWindowSize(_windowSizeNoButtons);
                 _plugin.Configuration.PlayerSettings.FirstRunSetNoButtons = false;
-                _plugin.Configuration.Save();
+                _plugin.ConfigurationManager.Save();
             }
 
             if (_plugin.Configuration.SpotifySettings.LimitedAccess && playerSettings.FirstRunCompactPlayer)
             {
                 ImGui.SetNextWindowSize(_windowSizeNoButtons);
                 _plugin.Configuration.PlayerSettings.FirstRunCompactPlayer = false;
-                _plugin.Configuration.Save();
+                _plugin.ConfigurationManager.Save();
             }
         }
 
@@ -179,7 +184,7 @@ namespace FantasyPlayer.Interface.Window
             if (_plugin.Configuration.PlayerSettings.FirstRunNone)
             {
                 _plugin.Configuration.PlayerSettings.FirstRunNone = false;
-                _plugin.Configuration.Save();
+                _plugin.ConfigurationManager.Save();
             }
 
             //////////////// Right click popup ////////////////
@@ -197,7 +202,7 @@ namespace FantasyPlayer.Interface.Window
                             {
                                 _playerManager.CurrentPlayerProvider = provider.Value;
                                 _plugin.Configuration.PlayerSettings.DefaultProvider = provider.Key.FullName;
-                                _plugin.Configuration.Save();
+                                _plugin.ConfigurationManager.Save();
                             }
                         }
                         ImGui.EndMenu();
@@ -247,17 +252,41 @@ namespace FantasyPlayer.Interface.Window
 
                 var track = playerState.CurrentlyPlaying;
 
-                if (playerState.IsPlaying)
-                    _progressDelta += ImGui.GetIO().DeltaTime;
+
 
                 if (_progressMs != playerState.ProgressMs)
-                    _progressDelta = 0;
-                _progressMs = playerState.ProgressMs;
+                {
+                    _lastUpdated = DateTime.Now;
+                    _progressMs = playerState.ProgressMs;
+                }
+                if (!playerState.IsPlaying)
+                {
+                    _lastUpdated = null;
+                }
+                float percent;
+                TimeSpan actualProgress;
+                TimeSpan songTotal;
 
-                var percent = playerState.ProgressMs * 100f / track.DurationMs +
-                              (_progressDelta / (track.DurationMs / 100000f)); //me good maths
-
-                _progressMs = playerState.ProgressMs;
+                if (_lastUpdated != null)
+                {
+                    actualProgress = (DateTime.Now - _lastUpdated.Value).Add(TimeSpan.FromMilliseconds(playerState.ProgressMs));
+                    songTotal = TimeSpan.FromMilliseconds(track.DurationMs);
+                    if (actualProgress >= songTotal)
+                    {
+                        actualProgress = songTotal;
+                    }
+                    percent = (float)((double) actualProgress.Ticks / songTotal.Ticks * 100);
+                }
+                else
+                {
+                    actualProgress = TimeSpan.FromMilliseconds(playerState.ProgressMs);
+                    songTotal = TimeSpan.FromMilliseconds(track.DurationMs);
+                    if (actualProgress >= songTotal)
+                    {
+                        actualProgress = songTotal;
+                    }
+                    percent = (float)((double) actualProgress.Ticks / songTotal.Ticks * 100);
+                }
 
                 var artists = track.Artists.Aggregate("", (current, artist) => current + (artist + ", "));
 
@@ -320,11 +349,18 @@ namespace FantasyPlayer.Interface.Window
 
                 if (!_plugin.Configuration.PlayerSettings.CompactPlayer)
                 {
+                    if (_plugin.Configuration.PlayerSettings.ShowTimeElapsed)
+                    {
+                        ImGuiUtil.Center(actualProgress.ToString("mm\\:ss", CultureInfo.InvariantCulture) + " / " +
+                                         songTotal.ToString("mm\\:ss", CultureInfo.InvariantCulture) +
+                                         (playerState.IsPlaying ? "" : " - Paused"));
+                    }
                     //////////////// Progress Bar ////////////////
 
                     ImGui.PushStyleColor(ImGuiCol.PlotHistogram, _plugin.Configuration.PlayerSettings.AccentColor);
                     ImGui.ProgressBar(percent / 100f, new Vector2(-1, 2f));
                     ImGui.PopStyleColor();
+                    
 
                     Vector2 imageSize = new Vector2(100 * ImGui.GetIO().FontGlobalScale,
                         100 * ImGui.GetIO().FontGlobalScale);
@@ -363,7 +399,7 @@ namespace FantasyPlayer.Interface.Window
                 {
                     _playerManager.CurrentPlayerProvider = provider.Value;
                     _plugin.Configuration.PlayerSettings.DefaultProvider = provider.Key.FullName;
-                    _plugin.Configuration.Save();
+                    _plugin.ConfigurationManager.Save();
                 }
             }
         }

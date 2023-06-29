@@ -1,5 +1,8 @@
 ﻿using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using FantasyPlayer.Interface;
+using FantasyPlayer.Interfaces;
 using FantasyPlayer.Provider.Common;
 using FantasyPlayer.Spotify;
 using SpotifyAPI.Web;
@@ -10,14 +13,14 @@ namespace FantasyPlayer.Provider
     {
         public PlayerStateStruct PlayerState { get; set; }
         
-        private Plugin _plugin;
+        private IPlugin _plugin;
         private SpotifyState _spotifyState;
         private string _lastId;
         
         private CancellationTokenSource _startCts;
         private CancellationTokenSource _loginCts;
 
-        public void Initialize(Plugin plugin)
+        public async Task<IPlayerProvider> Initialize(IPlugin plugin)
         {
             _plugin = plugin;
             PlayerState = new PlayerStateStruct
@@ -32,11 +35,12 @@ namespace FantasyPlayer.Provider
             _spotifyState.OnLoggedIn += OnLoggedIn;
             _spotifyState.OnPlayerStateUpdate += OnPlayerStateUpdate;
             
-            if (_plugin.Configuration.SpotifySettings.TokenResponse == null) return;
+            if (_plugin.Configuration.SpotifySettings.TokenResponse == null) return this;
             _spotifyState.TokenResponse = _plugin.Configuration.SpotifySettings.TokenResponse;
-            _spotifyState.RequestToken();
+            await _spotifyState.RequestToken();
             _startCts = new CancellationTokenSource();
             ThreadPool.QueueUserWorkItem(_spotifyState.Start, _startCts.Token);
+            return this;
         }
 
         private void OnPlayerStateUpdate(CurrentlyPlayingContext currentlyPlaying, FullTrack playbackItem)
@@ -94,7 +98,7 @@ namespace FantasyPlayer.Provider
                     _plugin.Configuration.PlayerSettings.NoButtons = true;
             }
 
-            _plugin.Configuration.Save();
+            _plugin.ConfigurationManager.Save();
         }
 
         public void Update()

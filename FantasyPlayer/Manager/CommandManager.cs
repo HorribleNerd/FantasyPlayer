@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Plugin;
+using FantasyPlayer.Interface;
+using FantasyPlayer.Interfaces;
 
 namespace FantasyPlayer.Manager
 {
@@ -19,19 +21,18 @@ namespace FantasyPlayer.Manager
         ToggleValue
     }
 
-    public class CommandManager
+    public class CommandManager : ICommandManager
     {
         private DalamudPluginInterface _pluginInterface;
-        private Plugin _plugin;
+        private IPlugin _plugin;
 
-        public readonly Dictionary<string, (OptionType type, string[] aliases, string helpString,
-            Action<bool, int, CallbackResponse>
-            commandCallback)> Commands =
+        public Dictionary<string, (OptionType type, string[] aliases, string helpString,
+            Action<bool, int, CallbackResponse> commandCallback)> Commands { get; } =
             new Dictionary<string, (OptionType type, string[] aliases, string helpString,
                 Action<bool, int, CallbackResponse>
                 commandCallback)>();
 
-        public CommandManager(DalamudPluginInterface pluginInterface, Plugin plugin)
+        public CommandManager(DalamudPluginInterface pluginInterface, IPlugin plugin)
         {
             _pluginInterface = pluginInterface;
             _plugin = plugin;
@@ -98,7 +99,7 @@ namespace FantasyPlayer.Manager
             chat.PrintError("That command wasn't found. For a list of commands please type: '/pfp help'");
         }
 
-        private void PrintHelp(bool boolValue, int intValue, CallbackResponse response)
+        public void PrintHelp(bool boolValue, int intValue, CallbackResponse response)
         {
             var chat = Service.ChatGui;
 
@@ -120,7 +121,7 @@ namespace FantasyPlayer.Manager
             chat.Print(helpMessage);
         }
 
-        private string GetCommandExample(OptionType optionType)
+        public string GetCommandExample(OptionType optionType)
         {
             switch (optionType)
             {

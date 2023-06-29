@@ -1,10 +1,14 @@
-﻿namespace FantasyPlayer.Provider.Common
+﻿using System.Threading.Tasks;
+using FantasyPlayer.Interface;
+using FantasyPlayer.Interfaces;
+
+namespace FantasyPlayer.Provider.Common
 {
     public interface IPlayerProvider
     {
         public PlayerStateStruct PlayerState { get; set; }
 
-        public void Initialize(Plugin plugin);
+        public Task<IPlayerProvider> Initialize(IPlugin plugin);
         public void Update();
         public void Dispose();
 

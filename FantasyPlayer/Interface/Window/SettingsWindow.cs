@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using System.Numerics;
+using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
 using OtterGui.Widgets;
 
@@ -7,9 +8,9 @@ namespace FantasyPlayer.Interface.Window
 {
     public class SettingsWindow
     {
-        private Plugin _plugin;
+        private IPlugin _plugin;
 
-        public SettingsWindow(Plugin plugin)
+        public SettingsWindow(IPlugin plugin)
         {
             _plugin = plugin;
 
@@ -38,13 +39,13 @@ namespace FantasyPlayer.Interface.Window
                 if (ImGui.CollapsingHeader("Fantasy Player"))
                 {
                     if (ImGui.Checkbox("Display chat messages", ref _plugin.Configuration.DisplayChatMessages))
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     if (Widget.DrawChatTypeSelector("Chat message output channel",
                             "To which chat channel should the fantasy player messages be echo'd?",
                             _plugin.Configuration.PlayerSettings.ChatType,
                             type => { _plugin.Configuration.PlayerSettings.ChatType = type; }))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
                 }
 
@@ -54,7 +55,7 @@ namespace FantasyPlayer.Interface.Window
                     {
                         if (ImGui.Checkbox("Auto play when entering Duty",
                             ref _plugin.Configuration.AutoPlaySettings.PlayInDuty))
-                            _plugin.Configuration.Save();
+                            _plugin.ConfigurationManager.Save();
                     }
                 }
 
@@ -71,7 +72,7 @@ namespace FantasyPlayer.Interface.Window
 
                     if (ImGui.Checkbox("Only open when logged in",
                         ref _plugin.Configuration.PlayerSettings.OnlyOpenWhenLoggedIn))
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
 
                     ImGui.Separator();
 
@@ -81,14 +82,14 @@ namespace FantasyPlayer.Interface.Window
                         {
                             if (_plugin.Configuration.PlayerSettings.NoButtons)
                                 _plugin.Configuration.PlayerSettings.NoButtons = false;
-                            _plugin.Configuration.Save();
+                            _plugin.ConfigurationManager.Save();
                         }
 
                         if (ImGui.Checkbox("Hide buttons", ref _plugin.Configuration.PlayerSettings.NoButtons))
                         {
                             if (_plugin.Configuration.PlayerSettings.CompactPlayer)
                                 _plugin.Configuration.PlayerSettings.CompactPlayer = false;
-                            _plugin.Configuration.Save();
+                            _plugin.ConfigurationManager.Save();
                         }
                     }
 
@@ -96,18 +97,24 @@ namespace FantasyPlayer.Interface.Window
 
                     if (ImGui.Checkbox("Player shown", ref _plugin.Configuration.PlayerSettings.PlayerWindowShown))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
 
                     if (ImGui.Checkbox("Player locked", ref _plugin.Configuration.PlayerSettings.PlayerLocked))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
 
                     if (ImGui.Checkbox("Player input disabled",
                         ref _plugin.Configuration.PlayerSettings.DisableInput))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
+                    }
+
+                    if (ImGui.Checkbox("Show time elapsed",
+                        ref _plugin.Configuration.PlayerSettings.ShowTimeElapsed))
+                    {
+                        _plugin.ConfigurationManager.Save();
                     }
 
                     ImGui.Separator();
@@ -115,19 +122,19 @@ namespace FantasyPlayer.Interface.Window
                     if (ImGui.SliderFloat("Player alpha", ref _plugin.Configuration.PlayerSettings.Transparency, 0f,
                         1f))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
 
                     if (ImGui.ColorEdit4("Player color", ref _plugin.Configuration.PlayerSettings.AccentColor))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
 
                     ImGui.SameLine();
                     if (ImGui.Button("Revert"))
                     {
                         _plugin.Configuration.PlayerSettings.AccentColor = InterfaceUtils.FantasyPlayerColor;
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
 
                     ImGui.Separator();
@@ -150,7 +157,7 @@ namespace FantasyPlayer.Interface.Window
 
                     if (ImGui.Checkbox("Show debug window", ref _plugin.Configuration.PlayerSettings.DebugWindowOpen))
                     {
-                        _plugin.Configuration.Save();
+                        _plugin.ConfigurationManager.Save();
                     }
                 }
 

@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using FantasyPlayer.Interface;
+using FantasyPlayer.Interfaces;
 using FantasyPlayer.Provider;
 using FantasyPlayer.Provider.Common;
 
@@ -11,12 +14,12 @@ namespace FantasyPlayer.Manager
 {
     public class PlayerManager
     {
-        private readonly Plugin _plugin;
+        private readonly IPlugin _plugin;
         public Dictionary<Type, IPlayerProvider> PlayerProviders;
 
         public IPlayerProvider CurrentPlayerProvider;
 
-        public PlayerManager(Plugin plugin)
+        public PlayerManager(IPlugin plugin)
         {
             _plugin = plugin;
             ResetProviders();
@@ -57,20 +60,28 @@ namespace FantasyPlayer.Manager
                 }
             }
 
+            List<Task<IPlayerProvider>> providerTasks = new List<Task<IPlayerProvider>>();
             foreach (var playerProvider in interfaces)
             {
                 PluginLog.Log("Found provider: " + playerProvider.FullName);
-                InitializeProvider(playerProvider,  (IPlayerProvider)Activator.CreateInstance(playerProvider));
+                providerTasks.Add(InitializeProvider(playerProvider,  (IPlayerProvider)Activator.CreateInstance(playerProvider)));
             }
+
+            Task.WhenAll(providerTasks).ContinueWith(task =>
+            {
+                foreach (var playerProvider in task.Result)
+                {
+                    PlayerProviders.Add(playerProvider.GetType(), playerProvider);
+
+                    if (_plugin.Configuration.PlayerSettings.DefaultProvider == playerProvider.GetType().FullName)
+                        CurrentPlayerProvider ??= playerProvider;
+                }
+            });
         }
 
-        private void InitializeProvider(Type type, IPlayerProvider playerProvider)
+        private Task<IPlayerProvider> InitializeProvider(Type type, IPlayerProvider playerProvider)
         {
-            playerProvider.Initialize(_plugin);
-            PlayerProviders.Add(type, playerProvider);
-
-            if (_plugin.Configuration.PlayerSettings.DefaultProvider == type.FullName)
-                CurrentPlayerProvider ??= playerProvider;
+            return playerProvider.Initialize(_plugin);
         }
 
         private void Update()

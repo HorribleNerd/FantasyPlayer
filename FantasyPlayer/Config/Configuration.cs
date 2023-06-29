@@ -15,17 +15,5 @@ namespace FantasyPlayer.Config
         public bool DisplayChatMessages;
 
         [NonSerialized] public bool ConfigShown;
-
-        [NonSerialized] private DalamudPluginInterface _pluginInterface;
-        
-        public void Initialize(DalamudPluginInterface pluginInterface)
-        {
-            _pluginInterface = pluginInterface;
-        }
-
-        public void Save()
-        {
-            _pluginInterface.SavePluginConfig(this);
-        }
     }
 }

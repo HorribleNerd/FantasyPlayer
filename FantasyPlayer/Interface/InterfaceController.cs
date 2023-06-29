@@ -1,4 +1,5 @@
 ﻿using FantasyPlayer.Interface.Window;
+using FantasyPlayer.Interfaces;
 
 namespace FantasyPlayer.Interface
 {
@@ -7,11 +8,11 @@ namespace FantasyPlayer.Interface
         private readonly PlayerWindow _player;
         private readonly SettingsWindow _settings;
         
-        public InterfaceController(Plugin plugin)
+        public InterfaceController(IPlugin plugin)
         {
             var plugin1 = plugin;
-            _player = new PlayerWindow(plugin1);
-            _settings = new SettingsWindow(plugin1);
+            _player = new PlayerWindow(plugin);
+            _settings = new SettingsWindow(plugin);
         }
 
         public void Draw()
