@@ -10,7 +10,6 @@ namespace FantasyPlayer.Interface
         
         public InterfaceController(IPlugin plugin)
         {
-            var plugin1 = plugin;
             _player = new PlayerWindow(plugin);
             _settings = new SettingsWindow(plugin);
         }

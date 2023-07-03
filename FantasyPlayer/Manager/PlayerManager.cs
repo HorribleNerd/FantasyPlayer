@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using FantasyPlayer.Extensions;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
 using FantasyPlayer.Provider;
@@ -42,29 +43,13 @@ namespace FantasyPlayer.Manager
         private void InitializeProviders()
         {
             var ppType = typeof(IPlayerProvider);
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var interfaces = new List<Type> { };
-            for (int i = 0; i < assemblies.Length; i++)
-            {
-                var potentiallyBad = assemblies[i];
-                try
-                {
-                    interfaces.AddRange(potentiallyBad
-                        .GetTypes()
-                        .Where(type => ppType.IsAssignableFrom(type) && !type.IsInterface));
-                }
-                catch (ReflectionTypeLoadException rtle)
-                {
-                    PluginLog.LogError(rtle, rtle.Message, rtle.LoaderExceptions);
-                    PluginLog.LogError($"Error loading Assembly while searching for PlayerProviders: \"{potentiallyBad.FullName}\"");
-                }
-            }
+            var interfaces = Assembly.GetExecutingAssembly().GetLoadableTypes().Where(c => ppType.IsAssignableFrom(c) && c.IsClass && !c.IsAbstract).ToList();
 
             List<Task<IPlayerProvider>> providerTasks = new List<Task<IPlayerProvider>>();
             foreach (var playerProvider in interfaces)
             {
                 PluginLog.Log("Found provider: " + playerProvider.FullName);
-                providerTasks.Add(InitializeProvider(playerProvider,  (IPlayerProvider)Activator.CreateInstance(playerProvider)));
+                providerTasks.Add(InitializeProvider(playerProvider,  new SpotifyProvider()));
             }
 
             Task.WhenAll(providerTasks).ContinueWith(task =>

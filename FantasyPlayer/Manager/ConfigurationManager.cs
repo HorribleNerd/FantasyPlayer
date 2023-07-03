@@ -22,7 +22,7 @@ public class ConfigurationManager : IConfigurationManager
 
     public void Load()
     {
-        Config = (Configuration)_pluginInterface.GetPluginConfig();
+        Config = (Configuration)_pluginInterface.GetPluginConfig() ?? new Configuration();
     }
 
     public void Save()
