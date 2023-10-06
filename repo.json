@@ -19,6 +19,6 @@
     "DownloadLinkInstall": "https://github.com/HorribleNerd/FantasyPlayer/releases/download/api_v9/fantasyplayer.zip",
     "DownloadLinkTesting": "https://github.com/HorribleNerd/FantasyPlayer/releases/download/api_v9/fantasyplayer.zip",
     "DownloadLinkUpdate": "https://github.com/HorribleNerd/FantasyPlayer/releases/download/api_v9/fantasyplayer.zip",
-    "IconUrl": "https://github.com/HorribleNerd/FantasyPlayer/blob/6ee70791e9377460579b23a00d9177a60dd08921/.repo_resources/logo.png"
+    "IconUrl": "https://raw.githubusercontent.com/HorribleNerd/FantasyPlayer/main/.repo_resources/logo.png"
   }
 ]
