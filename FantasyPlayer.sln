@@ -11,6 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OtterGui", "OtterGui\OtterG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FantasyPlayer.Mock", "FantasyPlayer.Mock\FantasyPlayer.Mock.csproj", "{668953BC-B270-43F7-952B-706ABFDD6DEC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD773011-C54C-4776-92DD-D08035B2D436}"
+	ProjectSection(SolutionItems) = preProject
+		repo.json = repo.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
