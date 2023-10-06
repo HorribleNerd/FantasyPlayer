@@ -3,7 +3,7 @@
     "Author": "HorribleNerd, Critical-Impact, BiscuitUmU",
     "Name": "Fantasy Player (DEV)",
     "Description": "Control Spotify playback from within FFXIV",
-    "InternalName": "FantasyPlayerDEV",
+    "InternalName": "FantasyPlayer",
     "AssemblyVersion": "2.1.1.1",
     "TestingAssemblyVersion": "2.1.1.1",
     "RepoUrl": "https://github.com/HorribleNerd/FantasyPlayer",
