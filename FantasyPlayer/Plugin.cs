@@ -71,7 +71,7 @@ namespace FantasyPlayer
                 Name = SeString.Empty,
                 Type = Configuration.PlayerSettings.ChatType,
             };
-            Service.ChatGui.PrintChat(entry);
+            Service.ChatGui.Print(entry);
         }
 
         public void DisplaySongTitle(string songTitle)
@@ -108,7 +108,7 @@ namespace FantasyPlayer
                 Name = SeString.Empty,
                 Type = Configuration.PlayerSettings.ChatType,
             };
-            Service.ChatGui.PrintChat(entry);
+            Service.ChatGui.Print(entry);
         }
 
         public void OpenConfig()

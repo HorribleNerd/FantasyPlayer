@@ -20,6 +20,10 @@ namespace FantasyPlayer.Spotify
         
         private FullTrack _lastFullTrack;
         private PrivateUser _user;
+
+        public Paging<SimplePlaylist> UserPlaylists;
+
+        
         public bool IsPremiumUser;
         private string _deviceId;
 
@@ -108,11 +112,13 @@ namespace FantasyPlayer.Spotify
                 _spotifyClient = new SpotifyClient(config);
 
                 var user = await _spotifyClient.UserProfile.Current();
-                //var playlists = await _spotifyClient.Playlists.GetUsers(user.Id);
+                var playlists = await _spotifyClient.Playlists.GetUsers(user.Id);
 
 
                 _user = user;
-                //UserPlaylists = playlists;
+                UserPlaylists = playlists;
+
+                
 
                 if (user.Product == "premium")
                     IsPremiumUser = true;
@@ -304,6 +310,21 @@ namespace FantasyPlayer.Spotify
             }
             catch (APIException)
             {
+            }
+        }
+
+        public async void SetPlaylist(SimplePlaylist playlist)
+        {
+            try
+            {
+                await _spotifyClient.Player.ResumePlayback(new PlayerResumePlaybackRequest {
+                    DeviceId = _deviceId,
+                    ContextUri = playlist.Uri
+                });
+            }
+            catch (APIException e)
+            {
+
             }
         }
 

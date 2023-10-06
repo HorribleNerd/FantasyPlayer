@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
+using SpotifyAPI.Web;
 
 namespace FantasyPlayer.Provider.Common
 {
@@ -21,5 +22,7 @@ namespace FantasyPlayer.Provider.Common
         public void SetSkip(bool forward);
         public void SetShuffle(bool value);
         public void SetVolume(int volume);
+
+        public Paging<SimplePlaylist> GetPlaylists();
     }
 }

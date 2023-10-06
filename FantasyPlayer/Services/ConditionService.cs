@@ -1,12 +1,13 @@
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Plugin.Services;
 using FantasyPlayer.Interfaces;
 
 namespace FantasyPlayer.Services;
 
 public class ConditionService : IConditionService
 {
-    private Condition _condition;
-    public ConditionService(Condition condition)
+    private ICondition _condition;
+    public ConditionService(ICondition condition)
     {
         _condition = condition;
     }
