@@ -1,9 +1,9 @@
-author: Critical-Impact
+author: HorribleNerd
 name: Fantasy Player
 description: |-
-  Control Spotify playback from within FFX|V
+  Control Spotify playback from within FFXIV
   Use the button below to open settings or use the '/pfp settings' command.
-  Originally by BiscuitUmU
+  Originally by BiscuitUmU/Critical-Impact
 repo_url: https://github.com/Critical-Impact/FantasyPlayer
 punchline: Like you'd ever be sick of the in game music right?
 IconUrl: https://raw.githubusercontent.com/Critical-Impact/FantasyPlayer/main/.repo_resources/logo.png
