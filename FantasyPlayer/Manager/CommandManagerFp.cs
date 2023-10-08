@@ -21,9 +21,8 @@ namespace FantasyPlayer.Manager
         ToggleValue
     }
 
-    public class CommandManagerFp : ICommandManagerFP
+    public class CommandManagerFp
     {
-        private DalamudPluginInterface _pluginInterface;
         private IPlugin _plugin;
 
         public Dictionary<string, (OptionType type, string[] aliases, string helpString,
@@ -32,9 +31,8 @@ namespace FantasyPlayer.Manager
                 Action<bool, int, CallbackResponse>
                 commandCallback)>();
 
-        public CommandManagerFp(DalamudPluginInterface pluginInterface, IPlugin plugin)
+        public CommandManagerFp(IPlugin plugin)
         {
-            _pluginInterface = pluginInterface;
             _plugin = plugin;
 
             Commands.Add("help", (OptionType.None, new string[] { "" }, "Show command help.", PrintHelp));

@@ -1,7 +1,11 @@
 ﻿using System.Numerics;
 using System.Reflection;
+using DalaMock;
+using DalaMock.Configuration;
+using DalaMock.Mock;
 using Dalamud.Interface;
 using ImGuiNET;
+using InventoryToolsMock;
 using Lumina;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -16,99 +20,46 @@ namespace FantasyPlayer.Mock
         private static CommandList _cl;
         public static ImGuiController _controller;
         private static Vector3 _clearColor = new Vector3(0.45f, 0.55f, 0.6f);
-        public static MockPlugin _mockPlugin;
+        public static MockPlugin? _mockPlugin;
+        private static MockSettingsWindow _mockSettingsWindow;
+        private static MockProgram _program;
 
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+            var yourServiceContainer = new Service();
+            _program = new MockProgram(yourServiceContainer);
+            _mockPlugin = new MockPlugin();
+            _program.SetPlugin(_mockPlugin);
+            _mockSettingsWindow = new MockSettingsWindow(_program);
+
+
+            if (AppSettings.Default.AutoStart)
             {
-                Console.WriteLine("Invalid arguments provided. Please provide the game directory and configuration directory as arguments to the executable.");
-                Console.ReadLine();
-                return;
+                _program.StartPlugin();
             }
 
-            var gameLocation = args[0];
-            if (!new DirectoryInfo(gameLocation).Exists)
+            while (_program.PumpEvents(PreUpdate, PostUpdate))
             {
-                Console.WriteLine("Game directory: " + gameLocation + " could not be found.");
-                Console.ReadLine();
-                return;
-            }
-            var configDirectory = args[1];
-            if (!new DirectoryInfo(configDirectory).Exists)
-            {
-                Console.WriteLine("Config directory: " + configDirectory + " could not be found.");
-                Console.ReadLine();
-                return;
-            }
-            
-            var configFile = Path.Combine(configDirectory,"FantasyPlayer.json");
-            if (args.Length > 2)
-            {
-                configFile = args[2];
-            }
-            if (!new FileInfo(configFile).Exists)
-            {
-                Console.WriteLine("Config file: " + configFile + " could not be found.");
-                Console.ReadLine();
-                return;
+    
             }
 
-            //Hack to bypass private set
-            var field = typeof(ImGuiHelpers).GetProperty("GlobalScale", 
-                BindingFlags.Static | 
-                BindingFlags.Public);
-            field.SetValue(null, 1);
-            
-            VeldridStartup.CreateWindowAndGraphicsDevice(
-                new WindowCreateInfo(50, 50, 1280, 720, WindowState.Normal, "Allagan Tools - Mocked"),
-                new GraphicsDeviceOptions(true, null, true, ResourceBindingModel.Improved, true, true),
-                out _window,
-                out _gd);
-            _window.Resized += () =>
+            if (_mockPlugin != null)
             {
-                _gd.MainSwapchain.Resize((uint)_window.Width, (uint)_window.Height);
-                _controller.WindowResized(_window.Width, _window.Height);
-            };
-            
-            _cl = _gd.ResourceFactory.CreateCommandList();
-            var gameData = new Lumina.GameData( gameLocation, new LuminaOptions()
-            {
-                PanicOnSheetChecksumMismatch = false
-            } );
-            _controller = new ImGuiController(gameData, _gd, _gd.MainSwapchain.Framebuffer.OutputDescription, _window.Width, _window.Height);
-            _mockPlugin = new MockPlugin(configFile);
-            
-            //Hack to bypass private set
-            var property = typeof(ImGuiHelpers).GetProperty("MainViewport", 
-                BindingFlags.Static | 
-                BindingFlags.Public);
-            property.SetValue(null, ImGui.GetMainViewport());
-            
-            while (_window.Exists)
-            {
-                InputSnapshot snapshot = _window.PumpEvents();
-                if (!_window.Exists) { break; }
-                //_mockPlugin._frameworkService.FireUpdate();
-                _controller.Update(1f / 60f, snapshot);
-
-                _mockPlugin.Draw();
-
-                _cl.Begin();
-                _cl.SetFramebuffer(_gd.MainSwapchain.Framebuffer);
-                _cl.ClearColorTarget(0, new RgbaFloat(_clearColor.X, _clearColor.Y, _clearColor.Z, 1f));
-                _controller.Render(_gd, _cl);
-                _cl.End();
-                _gd.SubmitCommands(_cl);
-                _gd.SwapBuffers(_gd.MainSwapchain);
+                _mockPlugin.Dispose();
             }
-            _mockPlugin.Dispose();
 
-            // Clean up Veldrid resources
-            _gd.WaitForIdle();
-            _controller.Dispose();
-            _cl.Dispose();
-            _gd.Dispose();
+            _program.Dispose();
         }
+
+        private static void PostUpdate()
+        {
+            _mockPlugin?.Draw();
+            _mockSettingsWindow?.Draw();
+        }
+
+        private static void PreUpdate()
+        {
+            _program.MockService?.MockFramework.FireUpdate();
+        }            
     }
 }

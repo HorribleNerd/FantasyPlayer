@@ -1,24 +1,26 @@
-﻿using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.Keys;
-using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
-using Dalamud.Game.Gui.Toast;
-using Dalamud.Game.Libc;
-using Dalamud.Game.Network;
+﻿using DalaMock.Shared.Interfaces;
 using Dalamud.IoC;
-using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 
 namespace FantasyPlayer
 {
-    public class Service
+    public class Service : IServiceContainer
     {
-        [PluginService] public static ChatGui ChatGui { get; private set; } = null!;
-        [PluginService] public static ClientState ClientState { get; private set; } = null!;
-        [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
-        [PluginService] public static Condition Condition { get; private set; } = null!;
+        [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
+        [PluginService] public static IClientState ClientState { get; private set; } = null!;
+        [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
+        [PluginService] public static ICondition Condition { get; private set; } = null!;
+        public static IPluginInterfaceService Interface { get; set; } = null!;
+        public IPluginInterfaceService PluginInterfaceService
+        {
+            get
+            {
+                return Interface;
+            }
+            set
+            {
+                Interface = value;
+            }
+        }
     }
 }

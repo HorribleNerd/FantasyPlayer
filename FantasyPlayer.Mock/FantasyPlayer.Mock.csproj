@@ -51,6 +51,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\DalaMock\DalaMock.Mock\DalaMock.Mock.csproj" />
         <ProjectReference Include="..\FantasyPlayer\FantasyPlayer.csproj" />
     </ItemGroup>
 

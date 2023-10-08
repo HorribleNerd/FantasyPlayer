@@ -1,4 +1,6 @@
 ﻿using System;
+using DalaMock.Shared;
+using DalaMock.Shared.Classes;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Game.Text;
@@ -10,7 +12,6 @@ using FantasyPlayer.Config;
 using FantasyPlayer.Interface;
 using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
-using FantasyPlayer.Services;
 
 namespace FantasyPlayer
 {
@@ -23,17 +24,16 @@ namespace FantasyPlayer
         public DalamudPluginInterface PluginInterface { get; private set; }
         public Configuration Configuration { get; set; }
         public PlayerManager PlayerManager { get; set; }
-        public ICommandManagerFP CommandManager { get; set; }
         public IClientState ClientState { get; set; }
-        public IConditionService ConditionService { get; set; }
         public IConfigurationManager ConfigurationManager { get; set; }
+        public CommandManagerFp CommandManager { get; set; }
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
             PluginInterface.Create<Service>();
+            Service.Interface = new PluginInterfaceService(pluginInterface);
             ClientState = Service.ClientState;
-            ConditionService = new ConditionService(Service.Condition);
 
             ConfigurationManager = new ConfigurationManager(PluginInterface);
             ConfigurationManager.Load();
@@ -46,8 +46,8 @@ namespace FantasyPlayer
 
             //Setup player
             PlayerManager = new PlayerManager(this);
-
-            CommandManager = new CommandManagerFp(pluginInterface, this);
+            
+            CommandManager = new CommandManagerFp(this);
 
             InterfaceController = new InterfaceController(this);
 
@@ -57,7 +57,7 @@ namespace FantasyPlayer
 
         private void OnCommand(string command, string arguments)
         {
-            CommandManager.ParseCommand(arguments);
+            Service.CommandManager.ProcessCommand(arguments);
         }
 
         public void DisplayMessage(string message)
@@ -71,7 +71,7 @@ namespace FantasyPlayer
                 Name = SeString.Empty,
                 Type = Configuration.PlayerSettings.ChatType,
             };
-            Service.ChatGui.PrintChat(entry);
+            Service.ChatGui.Print(entry);
         }
 
         public void DisplaySongTitle(string songTitle)
@@ -108,7 +108,7 @@ namespace FantasyPlayer
                 Name = SeString.Empty,
                 Type = Configuration.PlayerSettings.ChatType,
             };
-            Service.ChatGui.PrintChat(entry);
+            Service.ChatGui.Print(entry);
         }
 
         public void OpenConfig()
@@ -118,6 +118,7 @@ namespace FantasyPlayer
 
         public void Dispose()
         {
+            ConfigurationManager.Save();
             Service.CommandManager.RemoveHandler(Command);
             PluginInterface.UiBuilder.Draw -= InterfaceController.Draw;
             PluginInterface.UiBuilder.OpenConfigUi -= OpenConfig;

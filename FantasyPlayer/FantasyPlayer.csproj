@@ -38,7 +38,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="2.1.11" />
+    <PackageReference Include="DalamudPackager" Version="2.1.12" />
     <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +70,7 @@
     </ContentWithTargetPath>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DalaMock\DalaMock.Shared\DalaMock.Shared.csproj" />
     <ProjectReference Include="..\FantasyPlayer.Spotify\FantasyPlayer.Spotify.csproj" />
     <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
   </ItemGroup>

@@ -19,6 +19,7 @@ namespace FantasyPlayer.Manager
         public Dictionary<Type, IPlayerProvider> PlayerProviders;
 
         public IPlayerProvider CurrentPlayerProvider;
+        public bool ProvidersLoading = false;
 
         public PlayerManager(IPlugin plugin)
         {
@@ -42,6 +43,7 @@ namespace FantasyPlayer.Manager
 
         private void InitializeProviders()
         {
+            ProvidersLoading = true;
             var ppType = typeof(IPlayerProvider);
             var interfaces = Assembly.GetExecutingAssembly().GetLoadableTypes().Where(c => ppType.IsAssignableFrom(c) && c.IsClass && !c.IsAbstract).ToList();
 
@@ -61,6 +63,8 @@ namespace FantasyPlayer.Manager
                     if (_plugin.Configuration.PlayerSettings.DefaultProvider == playerProvider.GetType().FullName)
                         CurrentPlayerProvider ??= playerProvider;
                 }
+
+                ProvidersLoading = false;
             });
         }
 

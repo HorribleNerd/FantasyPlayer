@@ -86,7 +86,7 @@ namespace FantasyPlayer.Interface.Window
 
         private void CheckClientState()
         {
-            var isBoundByDuty = _plugin.ConditionService[ConditionFlag.BoundByDuty];
+            var isBoundByDuty = Service.Condition[ConditionFlag.BoundByDuty];
             if (_plugin.Configuration.AutoPlaySettings.PlayInDuty && isBoundByDuty &&
                 !_playerManager.CurrentPlayerProvider.PlayerState.IsPlaying)
             {
@@ -103,24 +103,27 @@ namespace FantasyPlayer.Interface.Window
         public void WindowLoop()
         {
             if (_plugin.Configuration.PlayerSettings.OnlyOpenWhenLoggedIn &&
-                _plugin.ClientState.LocalContentId == 0)
+                Service.ClientState.LocalContentId == 0)
                 return; //Do nothing
 
             if (_playerManager.CurrentPlayerProvider == null &&
                 _plugin.Configuration.PlayerSettings.PlayerWindowShown)
                 WelcomeWindow();
 
-            if (_playerManager.CurrentPlayerProvider != null &&
+            if (_playerManager.CurrentPlayerProvider != null && 
+                !_playerManager.ProvidersLoading &&
                 _playerManager.CurrentPlayerProvider.PlayerState.RequiresLogin &&
                 _plugin.Configuration.PlayerSettings.PlayerWindowShown &&
                 !_playerManager.CurrentPlayerProvider.PlayerState.IsLoggedIn)
                 LoginWindow(_playerManager.CurrentPlayerProvider);
 
             if (_playerManager.CurrentPlayerProvider != null &&
+                !_playerManager.ProvidersLoading &&
                 _plugin.Configuration.PlayerSettings.DebugWindowOpen)
                 DebugWindow(_playerManager.CurrentPlayerProvider.PlayerState);
 
             if (_playerManager.CurrentPlayerProvider != null &&
+                !_playerManager.ProvidersLoading &&
                 _playerManager.CurrentPlayerProvider.PlayerState.IsLoggedIn &&
                 _plugin.Configuration.PlayerSettings.PlayerWindowShown)
             {
@@ -390,6 +393,12 @@ namespace FantasyPlayer.Interface.Window
             if (!ImGui.Begin($"Fantasy Player: Welcome",
                 ref _plugin.Configuration.PlayerSettings.PlayerWindowShown,
                 ImGuiWindowFlags.NoResize)) return;
+            
+            if (_playerManager.ProvidersLoading)
+            {
+                InterfaceUtils.TextCentered($"The music providers are still being loaded.");
+                return;
+            }
 
             InterfaceUtils.TextCentered("Please select your default provider.");
             foreach (var provider in _playerManager.PlayerProviders)
@@ -410,6 +419,11 @@ namespace FantasyPlayer.Interface.Window
             if (!ImGui.Begin($"Fantasy Player: {playerProvider.PlayerState.ServiceName} Login",
                 ref _plugin.Configuration.PlayerSettings.PlayerWindowShown,
                 ImGuiWindowFlags.NoResize)) return;
+            
+            if (_playerManager.ProvidersLoading)
+            {
+                return;
+            }
 
             if (!playerProvider.PlayerState.IsAuthenticating)
             {

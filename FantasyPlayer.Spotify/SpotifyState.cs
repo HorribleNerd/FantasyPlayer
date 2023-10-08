@@ -90,7 +90,7 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        public async void Start(object obj)
+        public async Task Start(object obj)
         {
             try
             {
@@ -119,7 +119,7 @@ namespace FantasyPlayer.Spotify
 
                 OnLoggedIn?.Invoke(_user, TokenResponse);
                 _stateUpdateCts = new CancellationTokenSource();
-                ThreadPool.QueueUserWorkItem(StateUpdateTimer, _stateUpdateCts.Token);
+                StateUpdateTimer(_stateUpdateCts.Token);
             }
             catch (Exception e)
             {
@@ -127,7 +127,7 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        private async void StateUpdateTimer(object obj)
+        private async Task StateUpdateTimer(object obj)
         {
             while (true)
             {
@@ -189,7 +189,7 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        public async void StartAuth(object obj)
+        public async Task StartAuth(object obj)
         {
             CancellationToken token = (CancellationToken)obj;
             if (token.IsCancellationRequested)
@@ -242,7 +242,7 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        public async void Shuffle(bool value)
+        public async Task Shuffle(bool value)
         {
             try
             {
@@ -256,7 +256,7 @@ namespace FantasyPlayer.Spotify
             }
         }
 
-        public async void SwapRepeatState()
+        public async Task SwapRepeatState()
         {
             var state = CurrentlyPlaying.RepeatState switch
             {

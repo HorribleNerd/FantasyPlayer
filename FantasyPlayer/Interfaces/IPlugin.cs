@@ -11,10 +11,8 @@ public interface IPlugin
     InterfaceController InterfaceController { get; set; }
     Configuration Configuration { get; }
     PlayerManager PlayerManager { get; }
-    ICommandManagerFP CommandManager { get; }
-    IClientState ClientState { get; }
-    IConditionService ConditionService { get; }
     IConfigurationManager ConfigurationManager { get; }
+    CommandManagerFp CommandManager { get; set; }
 
     public void DisplaySongTitle(string songTitle);
     public void DisplayMessage(string message);

@@ -39,7 +39,7 @@ namespace FantasyPlayer.Provider
             _spotifyState.TokenResponse = _plugin.Configuration.SpotifySettings.TokenResponse;
             await _spotifyState.RequestToken();
             _startCts = new CancellationTokenSource();
-            ThreadPool.QueueUserWorkItem(_spotifyState.Start, _startCts.Token);
+            await Task.Run(() => _spotifyState.Start(_startCts.Token), _startCts.Token);
             return this;
         }
 
@@ -131,8 +131,7 @@ namespace FantasyPlayer.Provider
         public void StartAuth()
         {
             _loginCts = new CancellationTokenSource();
-            ThreadPool.QueueUserWorkItem(new WaitCallback(_spotifyState.StartAuth), _loginCts.Token);
-
+            Task.Run(() => _spotifyState.StartAuth(_loginCts.Token), _loginCts.Token);
             var playerStateStruct = PlayerState;
             playerStateStruct.IsAuthenticating = true;
             PlayerState = playerStateStruct;
