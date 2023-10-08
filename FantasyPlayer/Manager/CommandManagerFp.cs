@@ -11,14 +11,16 @@ namespace FantasyPlayer.Manager
     {
         None,
         Boolean,
-        Int
+        Int,
+        String
     }
 
     public enum CallbackResponse //TODO: better name needed...?
     {
         None,
         SetValue,
-        ToggleValue
+        ToggleValue,
+        SetValueString
     }
 
     public class CommandManagerFp
@@ -26,9 +28,9 @@ namespace FantasyPlayer.Manager
         private IPlugin _plugin;
 
         public Dictionary<string, (OptionType type, string[] aliases, string helpString,
-            Action<bool, int, CallbackResponse> commandCallback)> Commands { get; } =
-            new Dictionary<string, (OptionType type, string[] aliases, string helpString,
-                Action<bool, int, CallbackResponse>
+            Action<string, int, CallbackResponse> commandCallback)> Commands { get; } = new Dictionary<string, 
+                (OptionType type, string[] aliases, string helpString,
+                Action<string, int, CallbackResponse>
                 commandCallback)>();
 
         public CommandManagerFp(IPlugin plugin)
@@ -40,12 +42,12 @@ namespace FantasyPlayer.Manager
 
         public void ParseCommand(string argsString)
         {
-            var args = argsString.ToLower().Split(' ');
+            var args = argsString.ToLower().Split(' '); // TODO: Don't split at quotes
 
             var chat = Service.ChatGui;
 
             if (args.Length == 0)
-                PrintHelp(false, 0, CallbackResponse.None);
+                PrintHelp("", 0, CallbackResponse.None);
 
             if (args.Length < 1)
                 return;
@@ -59,23 +61,34 @@ namespace FantasyPlayer.Manager
 
                 if (cmd.type == OptionType.None)
                 {
-                    cmd.commandCallback.Invoke(false, 0, CallbackResponse.None);
+                    cmd.commandCallback.Invoke("", 0, CallbackResponse.None);
                     return;
+                }
+                if (cmd.type == OptionType.String)
+                {
+                    if (args.Length < 2)
+                    {
+                        chat.PrintError($"You need to provide a string for the '{command.Key}' command!");
+                        return;
+                    }
+                    cmd.commandCallback.Invoke(argsString.ToLower().Split(' ', 2)[1], 0, CallbackResponse.SetValueString);
+                    return;
+
                 }
 
                 if (cmd.type == OptionType.Boolean)
                 {
                     if (args.Length < 2)
-                        cmd.commandCallback.Invoke(false, 0, CallbackResponse.ToggleValue);
+                        cmd.commandCallback.Invoke("", 0, CallbackResponse.ToggleValue);
 
                     if (args[1] == "toggle")
-                        cmd.commandCallback.Invoke(false, 0, CallbackResponse.ToggleValue);
+                        cmd.commandCallback.Invoke("", 0, CallbackResponse.ToggleValue);
 
                     if (args[1] == "off")
-                        cmd.commandCallback.Invoke(false, 0, CallbackResponse.SetValue);
+                        cmd.commandCallback.Invoke("", 0, CallbackResponse.SetValue);
 
                     if (args[1] == "on")
-                        cmd.commandCallback.Invoke(true, 0, CallbackResponse.SetValue);
+                        cmd.commandCallback.Invoke("", 1, CallbackResponse.SetValue);
 
                     return;
                 }
@@ -89,7 +102,7 @@ namespace FantasyPlayer.Manager
                     }
 
                     if (!int.TryParse(args[1], out var value)) return;
-                    cmd.commandCallback.Invoke(false, value, CallbackResponse.SetValue);
+                    cmd.commandCallback.Invoke("", value, CallbackResponse.SetValue);
                     return;
                 }
             }
@@ -97,7 +110,7 @@ namespace FantasyPlayer.Manager
             chat.PrintError("That command wasn't found. For a list of commands please type: '/pfp help'");
         }
 
-        public void PrintHelp(bool boolValue, int intValue, CallbackResponse response)
+        public void PrintHelp(string boolValue, int intValue, CallbackResponse response)
         {
             var chat = Service.ChatGui;
 

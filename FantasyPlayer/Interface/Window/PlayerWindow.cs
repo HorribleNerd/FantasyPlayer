@@ -10,8 +10,10 @@ using FantasyPlayer.Interfaces;
 using FantasyPlayer.Manager;
 using FantasyPlayer.Provider;
 using FantasyPlayer.Provider.Common;
+using FantasyPlayer.Spotify;
 using ImGuiNET;
 using OtterGui;
+using Swan;
 
 namespace FantasyPlayer.Interface.Window
 {
@@ -65,6 +67,7 @@ namespace FantasyPlayer.Interface.Window
             cmdManager.Commands.Remove("play");
             cmdManager.Commands.Remove("volume");
             cmdManager.Commands.Remove("relogin");
+            cmdManager.Commands.Remove("playlist");
 
             cmdManager.Commands.Add("shuffle",
                 (OptionType.Boolean, new string[] { }, "Toggle shuffle.", OnShuffleCommand));
@@ -78,7 +81,8 @@ namespace FantasyPlayer.Interface.Window
                 (OptionType.None, new string[] { }, "Continue playback.", OnPlayCommand));
             cmdManager.Commands.Add("volume",
                 (OptionType.Int, new string[] { }, "Set playback volume.", OnVolumeCommand));
-
+            cmdManager.Commands.Add("playlist",
+                (OptionType.String, new string[] { }, "Play a playlist.", OnPlaylistCommand));
             cmdManager.Commands.Add("relogin",
                 (OptionType.None, new string[] {"reauth"}, "Re-opens the login window and lets you login again",
                     OnReLoginCommand));
@@ -377,7 +381,15 @@ namespace FantasyPlayer.Interface.Window
                     ImGui.Spacing();
                     InterfaceUtils.TextCentered(artists.Remove(artists.Length - 2));
 
-
+                    /*
+                    ImGui.Separator();
+                    
+                    if (ImGui.SliderFloat("Volume", ref _playerManager.CurrentPlayerProvider.SetVolume, 0f,
+                        1f))
+                    {
+                        _plugin.ConfigurationManager.Save();
+                    }
+                    */
                     ImGui.PopStyleColor();
                 }
 
@@ -494,8 +506,27 @@ namespace FantasyPlayer.Interface.Window
 
         //////////////// Commands ////////////////
 
+        private void OnPlaylistCommand(string stringValue, int intValue, CallbackResponse response)
+        {
+            var playerProvider = _playerManager.CurrentPlayerProvider;
+            if (playerProvider is SpotifyProvider)
+            {
+                SpotifyProvider spotify = (SpotifyProvider)playerProvider;
+                var playlists = spotify.GetPlaylists();
 
-        private void OnReLoginCommand(bool boolValue, int intValue, CallbackResponse response)
+                foreach (var playlist in playlists.Items)
+                {
+                    if (playlist.Name.ToLower().StartsWith(stringValue))
+                    {
+                        _plugin.DisplayMessage($"Playing playlist: {playlist.Name}");
+                        spotify.SetPlaylist(playlist);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void OnReLoginCommand(string stringValue, int intValue, CallbackResponse response)
         {
             var playerState = _playerManager.CurrentPlayerProvider.PlayerState;
             playerState.IsLoggedIn = false;
@@ -503,17 +534,17 @@ namespace FantasyPlayer.Interface.Window
             _playerManager.CurrentPlayerProvider.ReAuth();
         }
 
-        private void OnDisplayCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnDisplayCommand(string stringValue, int intValue, CallbackResponse response)
         {
             _plugin.Configuration.PlayerSettings.PlayerWindowShown = response switch
             {
-                CallbackResponse.SetValue => boolValue,
+                CallbackResponse.SetValue => intValue == 1,
                 CallbackResponse.ToggleValue => !_plugin.Configuration.PlayerSettings.PlayerWindowShown,
                 _ => _plugin.Configuration.PlayerSettings.PlayerWindowShown
             };
         }
 
-        private void OnVolumeCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnVolumeCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (_playerManager.CurrentPlayerProvider.PlayerState.ServiceName == null)
                 return;
@@ -522,7 +553,7 @@ namespace FantasyPlayer.Interface.Window
             _playerManager.CurrentPlayerProvider.SetVolume(intValue);
         }
 
-        private void OnShuffleCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnShuffleCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (_playerManager.CurrentPlayerProvider.PlayerState.ServiceName == null)
                 return;
@@ -531,13 +562,13 @@ namespace FantasyPlayer.Interface.Window
             {
                 case CallbackResponse.SetValue:
                 {
-                    if (boolValue)
+                    if (intValue == 1)
                         _plugin.DisplayMessage("Turned on shuffle.");
 
-                    if (!boolValue)
+                    if (intValue == 0)
                         _plugin.DisplayMessage("Turned off shuffle.");
 
-                    _playerManager.CurrentPlayerProvider.SetShuffle(boolValue);
+                    _playerManager.CurrentPlayerProvider.SetShuffle(intValue == 1);
                     break;
                 }
                 case CallbackResponse.ToggleValue:
@@ -559,7 +590,7 @@ namespace FantasyPlayer.Interface.Window
             }
         }
 
-        private void OnNextCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnNextCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (_playerManager.CurrentPlayerProvider.PlayerState.ServiceName == null)
                 return;
@@ -568,7 +599,7 @@ namespace FantasyPlayer.Interface.Window
             _playerManager.CurrentPlayerProvider.SetSkip(true);
         }
 
-        private void OnBackCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnBackCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (_playerManager.CurrentPlayerProvider.PlayerState.ServiceName == null)
                 return;
@@ -577,7 +608,7 @@ namespace FantasyPlayer.Interface.Window
             _playerManager.CurrentPlayerProvider.SetSkip(false);
         }
 
-        private void OnPlayCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnPlayCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (_playerManager.CurrentPlayerProvider.PlayerState.ServiceName == null)
                 return;
@@ -589,7 +620,7 @@ namespace FantasyPlayer.Interface.Window
             _playerManager.CurrentPlayerProvider.SetPauseOrPlay(true);
         }
 
-        private void OnPauseCommand(bool boolValue, int intValue, CallbackResponse response)
+        private void OnPauseCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (_playerManager.CurrentPlayerProvider.PlayerState.ServiceName == null)
                 return;

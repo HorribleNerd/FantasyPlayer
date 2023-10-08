@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FantasyPlayer.Interface;
@@ -98,6 +99,12 @@ namespace FantasyPlayer.Provider
                     _plugin.Configuration.PlayerSettings.NoButtons = true;
             }
 
+            foreach (var playlist in _spotifyState.UserPlaylists.Items)
+            {
+                Service.PluginLog.Debug("Found playlist: " + playlist.Name);
+            }
+            
+
             _plugin.ConfigurationManager.Save();
         }
 
@@ -170,6 +177,23 @@ namespace FantasyPlayer.Provider
         {
             if (_spotifyState.CurrentlyPlaying != null)
                 _spotifyState.SetVolume(volume);
+        }
+
+        public void SetPlaylist(SimplePlaylist playlist)
+        {
+            if (_spotifyState != null)
+            {
+                _spotifyState.SetPlaylist(playlist);
+            }
+        }
+
+        public Paging<SimplePlaylist> GetPlaylists()
+        {
+            if (_spotifyState != null)
+            {
+                return _spotifyState.UserPlaylists;
+            }
+            return null;
         }
     }
 }

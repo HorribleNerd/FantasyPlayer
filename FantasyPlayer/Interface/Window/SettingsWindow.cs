@@ -167,10 +167,10 @@ namespace FantasyPlayer.Interface.Window
             }
         }
 
-        public void OnConfigCommand(bool boolValue, int intValue, CallbackResponse response)
+        public void OnConfigCommand(string stringValue, int intValue, CallbackResponse response)
         {
             if (response == CallbackResponse.SetValue)
-                _plugin.Configuration.ConfigShown = boolValue;
+                _plugin.Configuration.ConfigShown = intValue == 1;
 
             if (response == CallbackResponse.ToggleValue)
                 _plugin.Configuration.ConfigShown = !_plugin.Configuration.ConfigShown;
