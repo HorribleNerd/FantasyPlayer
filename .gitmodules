@@ -3,4 +3,4 @@
 	url = https://github.com/Ottermandias/OtterGui.git
 [submodule "DalaMock"]
 	path = DalaMock
-	url = git@github.com:Critical-Impact/DalaMock.git
+	url = https://github.com/Critical-Impact/DalaMock.git
