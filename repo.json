@@ -1,0 +1,24 @@
+[
+  {
+    "Author": "HorribleNerd, Critical-Impact, BiscuitUmU",
+    "Name": "Fantasy Player (DEV)",
+    "Description": "Control Spotify playback from within FFXIV",
+    "InternalName": "FantasyPlayerDEV",
+    "AssemblyVersion": "2.1.1.1",
+    "TestingAssemblyVersion": "2.1.1.1",
+    "RepoUrl": "https://github.com/HorribleNerd/FantasyPlayer",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 9,
+    "IsHide": "False",
+    "IsTestingExclusive": "False",
+    "DownloadCount": 0,
+    "LastUpdate": 0,
+    "LoadPriority": 69420,
+    "LoadRequiredState": 2,
+    "LoadSync": true,
+    "DownloadLinkInstall": "https://github.com/HorribleNerd/FantasyPlayer/releases/download/api_v9/fantasyplayer.zip",
+    "DownloadLinkTesting": "https://github.com/HorribleNerd/FantasyPlayer/releases/download/api_v9/fantasyplayer.zip",
+    "DownloadLinkUpdate": "https://github.com/HorribleNerd/FantasyPlayer/releases/download/api_v9/fantasyplayer.zip",
+    "IconUrl": "https://raw.githubusercontent.com/HorribleNerd/FantasyPlayer/main/.repo_resources/logo.png"
+  }
+]

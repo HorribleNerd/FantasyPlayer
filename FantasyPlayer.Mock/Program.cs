@@ -4,6 +4,7 @@ using DalaMock;
 using DalaMock.Configuration;
 using DalaMock.Mock;
 using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using ImGuiNET;
 using InventoryToolsMock;
 using Lumina;
